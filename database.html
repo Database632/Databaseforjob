@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Пользователи</title>
+<style>
+    body {
+        background-color: #f5f5dc; /* Бежевый фон */
+        font-family: Arial, sans-serif;
+    }
+    h2 {
+        text-align: center;
+    }
+    button {
+        background-color: #8b4513; /* Тёмно-коричневый цвет */
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        margin-bottom: 20px;
+    }
+    button:hover {
+        background-color: #a0522d; /* Светло-коричневый цвет */
+    }
+    form {
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    label, input, textarea {
+        display: block;
+        margin: 0 auto 10px;
+    }
+    input, textarea {
+        width: 80%;
+        padding: 10px;
+    }
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.8); /* Темный фон */
+    }
+    .modal-content {
+        background-color: #333; /* Темный цвет модального окна */
+        color: white;
+        margin: 10% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 600px;
+    }
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+    .close:hover,
+    .close:focus {
+        color: white;
+        text-decoration: none;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+
+<h2>Пользователи</h2>
+
+<!-- Кнопка для открытия модального окна -->
+<button onclick="openAddModal()">Добавить пользователя</button>
+
+<!-- Модальное окно для добавления пользователя -->
+<div id="addModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeAddModal()">&times;</span>
+    <h3>Добавить пользователя</h3>
+    <form id="addUserForm">
+        <label for="code">Код:</label><br>
+        <input type="text" id="code" name="code" required><br>
+        <label for="registrationDate">Дата регистрации:</label><br>
+        <input type="date" id="registrationDate" name="registrationDate" required><br>
+        <label for="info">Информация:</label><br>
+        <textarea id="info" name="info" rows="4" required></textarea><br><br>
+        <input type="submit" value="Добавить">
+    </form>
+  </div>
+</div>
+
+<!-- Модальное окно для редактирования пользователя -->
+<div id="editModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeEditModal()">&times;</span>
+    <h3>Редактировать пользователя</h3>
+    <form id="editUserForm">
+        <input type="hidden" id="editId" name="editId">
+        <label for="editCode">Код:</label><br>
+        <input type="text" id="editCode" name="editCode" required><br>
+        <label for="editRegistrationDate">Дата регистрации:</label><br>
+        <input type="date" id="editRegistrationDate" name="editRegistrationDate" required><br>
+        <label for="editInfo">Информация:</label><br>
+        <textarea id="editInfo" name="editInfo" rows="4" required></textarea><br><br>
+        <input type="submit" value="Сохранить изменения">
+    </form>
+  </div>
+</div>
+
+<!-- Форма для поиска -->
+<form id="searchForm">
+    <label for="searchCode">Поиск по коду:</label>
+    <input type="text" id="searchCode" name="searchCode">
+    <button type="button" onclick="searchUsers()">Найти</button>
+</form>
+
+<!-- Место для вывода результатов поиска -->
+<div id="searchResults"></div>
+
+<script>
+// Инициализация списка пользователей из Local Storage
+let users = JSON.parse(localStorage.getItem('users')) || [];
+
+// Открытие модального окна для добавления пользователя
+function openAddModal() {
+    document.getElementById("addModal").style.display = "block";
+}
+
+// Закрытие модального окна для добавления пользователя
+function closeAddModal() {
+    document.getElementById("addModal").style.display = "none";
+}
+
+// Открытие модального окна для редактирования пользователя
+function openEditModal(user) {
+    document.getElementById("editId").value = user.id;
+    document.getElementById("editCode").value = user.code;
+    document.getElementById("editRegistrationDate").value = user.registration_date;
+    document.getElementById("editInfo").value = user.info;
+    document.getElementById("editModal").style.display = "block";
+}
+
+// Закрытие модального окна для редактирования пользователя
+function closeEditModal() {
+    document.getElementById("editModal").style.display = "none";
+}
+
+// Поиск пользователей
+function searchUsers() {
+    let searchCode = document.getElementById("searchCode").value;
+    let searchResultsDiv = document.getElementById("searchResults");
+    searchResultsDiv.innerHTML = "<h3>Результаты поиска:</h3>";
+
+    let user = users.find(user => user.code === searchCode);
+    if (user) {
+        searchResultsDiv.innerHTML += `
+            <p>Код: ${user.code}</p>
+            <p>Дата регистрации: ${user.registration_date}</p>
+            <p>Информация: ${user.info}</p>
+            <button onclick='openEditModal(${JSON.stringify(user)})'>Редактировать</button>
+        `;
+    } else {
+        searchResultsDiv.innerHTML += "<p>Пользователь не найден</p>";
+    }
+}
+
+// Обработка формы добавления пользователя
+document.getElementById("addUserForm").onsubmit = function(event) {
+    event.preventDefault();
+    let code = document.getElementById("code").value;
+    let registration_date = document.getElementById("registrationDate").value;
+    let info = document.getElementById("info").value;
+
+    let newUser = { id: users.length + 1, code, registration_date, info };
+    users.push(newUser);
+    localStorage.setItem('users', JSON.stringify(users));
+    closeAddModal();
+    alert("Пользователь добавлен!");
+}
+
+// Обработка формы редактирования пользователя
+document.getElementById("editUserForm").onsubmit = function(event) {
+    event.preventDefault();
+    let id = document.getElementById("editId").value;
+    let code = document.getElementById("editCode").value;
+    let registration_date = document.getElementById("editRegistrationDate").value;
+    let info = document.getElementById("editInfo").value;
+
+    let user = users.find(user => user.id == id);
+    user.code = code;
+    user.registration_date = registration_date;
+    user.info = info;
+    localStorage.setItem('users', JSON.stringify(users));
+    closeEditModal();
+    alert("Изменения сохранены!");
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Вход</title>
+<style>
+    body {
+        background-color: #f5f5dc; /* Бежевый фон */
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+    .login-container {
+        background-color: #fff;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        width: 300px;
+    }
+    h2 {
+        text-align: center;
+    }
+    label, input {
+        display: block;
+        width: 100%;
+        margin: 10px 0;
+    }
+    input {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+    }
+    button {
+        background-color: #8b4513;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        width: 100%;
+    }
+    button:hover {
+        background-color: #a0522d;
+    }
+</style>
+</head>
+<body>
+<div class="login-container">
+    <h2>Вход</h2>
+    <form id="loginForm">
+        <label for="username">Логин:</label>
+        <input type="text" id="username" name="username" required>
+        <label for="password">Пароль:</label>
+        <input type="password" id="password" name="password" required>
+        <button type="submit">Войти</button>
+    </form>
+    <p id="errorMessage" style="color:red; display:none;">Неправильный логин или пароль</p>
+</div>
+<script>
+    document.getElementById('loginForm').onsubmit = function(event) {
+        event.preventDefault();
+        let username = document.getElementById('username').value;
+        let password = document.getElementById('password').value;
+        if (username === 'Admin' && password === '12345678') {
+            window.location.href = 'database.html';
+        } else {
+            document.getElementById('errorMessage').style.display = 'block';
+        }
+    }
+</script>
+</body>
+</html>
